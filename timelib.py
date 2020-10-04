@@ -26,9 +26,6 @@ def weekly_list(N):
 num_days = 6
 list = weekly_list(num_days)
 
-for i in range(num_days):
-    print(list[i].strftime('%A'))
-
 def get_json_list(json_name):
     with open(json_name) as f:
         para_list = json.load(f)
@@ -38,8 +35,6 @@ setlist = get_json_list("time_setting.json")
 
 if dw == setlist["Day of the week"] and hour == str(setlist["Hour"]) and minutes == str(setlist["Minutes"]):
     pass
-
-import_value = 0
 
 def spreadsheet_func():
     global import_value
@@ -60,10 +55,22 @@ def spreadsheet_func():
     #共有設定したスプレッドシートのシート1を開く
     worksheet = gc.open_by_key(SPREADSHEET_KEY).sheet1
 
-    #for i in range(10):
-        #セルの値を受け取る
-    import_value = worksheet.acell('B7').value
+    return worksheet
 
-#spreadsheet_func()
-#print(import_value == "")
+worksheet = spreadsheet_func()
+
+import_value = 'null'
+i = 1
+import_value_list = []
+#Rows and columns
+while import_value is not '':
+    import_value_list.append([])
+    for columns in ['A','B','C','D']:
+        selectedcell = columns + str(i)
+        print(selectedcell)
+        import_value = worksheet.acell(selectedcell).value
+        import_value_list[i-1].append(import_value)
+    i = i + 1
+del import_value_list[-1]
+
 
