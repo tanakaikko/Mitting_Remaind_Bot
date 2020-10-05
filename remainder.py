@@ -1,8 +1,11 @@
 import datetime,json,gspread
 #ServiceAccountCredentials：Googleの各サービスへアクセスできるservice変数を生成します。
 from oauth2client.service_account import ServiceAccountCredentials 
-import smtplib, ssl
+import smtplib, ssl, getpass
 from email.mime.text import MIMEText
+
+
+password = ""
 
 def weekly_list(N):
     out_list = []
@@ -41,7 +44,7 @@ def get_cell():
     i = 1
     import_value_list = []
     #Rows and columns
-    while import_value is not '':
+    while import_value != '':
         import_value_list.append([])
         for columns in ['A','B','C','D']:
             selectedcell = columns + str(i)
@@ -51,11 +54,7 @@ def get_cell():
 
     return import_value_list
 
-def sent_mail(msg):
-    # 以下にGmailの設定を書き込む★ --- (*1)
-    gmail_account = "s17a2082ju@s.chibakoudai.jp"
-    gmail_password = "avtr85zd"
-
+def sent_mail(gmail_account,gmail_password,msg):
     # Gmailに接続 --- (*4)
     server = smtplib.SMTP_SSL("smtp.gmail.com", 465,
         context=ssl.create_default_context())
@@ -98,8 +97,8 @@ https://forms.gle/AEWTkZ4VeHUAw9G58
 ＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊
 このフォームは，毎週水曜日の朝9:00に締め切り，その後の回答は翌週の進捗報告会への希望と判断いたします．
 日・月・火・水・木・金・土
-→ → → → →→｜→ → → → → 
-        ↑ 　　    ↑
+→ → → → →  →｜→  →  →  →  → 
+        ↑ 　　      ↑
 この範囲の回答は，  ↑　
 今週の金曜日の希望  ↑
     　　　　　　　この範囲は，翌週の金曜日の希望と判断いたします．
@@ -118,12 +117,15 @@ https://forms.gle/AEWTkZ4VeHUAw9G58
 
     return [subject,body]
 
-def main():
-    #Sunday Monday Tuesday Wednesday Thursday Friday Saturday
+def get_pas():
+    global password
+    password = getpass.getpass()
 
+def main(fig):
+    #Sunday Monday Tuesday Wednesday Thursday Friday Saturday
     dt_now = datetime.datetime.now()
     
-    #Day of the week
+    #Day of the weekavtr85zd
     dw= dt_now.strftime('%A')
 
     #hour set
@@ -132,32 +134,39 @@ def main():
     #minuts set
     minutes = dt_now.strftime('%M')
 
+    print(int(hour),int(minutes))
     num_days = 6
     weeklist = weekly_list(num_days)
 
     setlist = get_json_list("time_setting.json")
-    #str(setlist["Hour"]) 
-    if dw == setlist["Day of the week"] and hour == "00" :#and minutes == str(setlist["Minutes"]):
-        output_data = get_cell()
-        sent_list = []
-        #内容があるかサーチ
-        i = 1
-        while output_data[i][0] is not '':
-            for j in range(6):
-                ok_day = weeklist[j].strftime('%Y/%m/%d')
-                if ok_day in output_data[i][0]:
-                    sent_list.append(output_data[i][1])
-            i = i + 1
-        nest_week = datetime.datetime.now() + datetime.timedelta(days=7)
-        msg_list = ''
-        for name in sent_list:
-            msg_list = msg_list + name + ","
 
-        listout = body_setting(dt_now.strftime('%Y/%m/%d(%A)'),nest_week.strftime('%Y/%m/%d(%A)'),msg_list,sent_list is not None)
-        msg = MIMEText(listout[1])
-        msg["Subject"] = listout[0]
-        msg["From"] = setlist["From_email"]
-        msg["To"] = setlist["To_email"]
-        sent_mail(msg)
+    if dw == setlist["Day of the week"]:
+        if int(hour) >= setlist["Hour"] and int(minutes) >= setlist["Minutes"] and fig:
+            output_data = get_cell()
+            sent_list = []
+            #内容があるかサーチ
+            i = 1
+            while output_data[i][0] != '':
+                for j in range(6):
+                    ok_day = weeklist[j].strftime('%Y/%m/%d')
+                    if ok_day in output_data[i][0]:
+                        sent_list.append(output_data[i][1])
+                i = i + 1
+            msg_list = ''
+            for name in sent_list:
+                msg_list = msg_list + name + ","
+            
+            today_data = datetime.datetime.now() + datetime.timedelta(days=setlist["Today"])
+            nest_week = datetime.datetime.now() + datetime.timedelta(days=(7+setlist["Today"]))
 
-main()
+            listout = body_setting(today_data.strftime('%Y/%m/%d(%A)'),nest_week.strftime('%Y/%m/%d(%A)'),msg_list,sent_list is not None)
+            msg = MIMEText(listout[1])
+            msg["Subject"] = listout[0]
+            msg["From"] = setlist["From_email"]
+            msg["To"] = setlist["To_email"]
+            sent_mail(setlist["From_email"],password,msg)
+            
+        return False
+
+    else:
+        return True
