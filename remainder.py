@@ -1,7 +1,7 @@
 import datetime,json,gspread
 #ServiceAccountCredentials：Googleの各サービスへアクセスできるservice変数を生成します。
 from oauth2client.service_account import ServiceAccountCredentials 
-import smtplib, ssl, getpass
+import smtplib, ssl, getpass,emailtxt
 from email.mime.text import MIMEText
 
 
@@ -61,62 +61,6 @@ def sent_mail(gmail_account,gmail_password,msg):
     server.login(gmail_account, gmail_password)
     server.send_message(msg) # メールの送信
 
-def body_setting(today,naxtday,namelist,yesorno):
-    body1 = """
-※自動送信です．
-tttの皆様
-
-平素よりお世話になっております．
-tttのnameです．
-"""
-    subject = today + "の進捗報告会について"
-    body2_1 = """
-
-上記のスプレッドシートの通り，今週進捗発表希望者がいなかったため，
-今週{0}の進捗報告会は，お休みとさせていただきます．
-""".format(today)
-
-    body2_2 = """
-
-上記のスプレッドシートの通り，
-{1}
-が報告を希望されたので，今週{0}の進捗報告会は開催となります．
-
-""".format(today, namelist)
-
-    body3 = """
-なお，来週{0} の進捗報告会希望の方は，
-以下の通りに，希望届を提出してください．
-
-※いつかのメールの内容
-
-↑のフォームに回答していただき，田中から全体に開催のご連絡をする形にいたします．
-フォームは，使いまわしますので卒業まで上記のURLから申請してください．
-また，以下にフォーム利用の注意点について，記載いたします．
-
-＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊
-このフォームは，毎週水曜日の朝9:00に締め切り，その後の回答は翌週の進捗報告会への希望と判断いたします．
-日・月・火・水・木・金・土
-→ → → → →  →｜→  →  →  →  → 
-        ↑ 　　      ↑
-この範囲の回答は，  ↑　
-今週の金曜日の希望  ↑
-    　　　　　　　この範囲は，翌週の金曜日の希望と判断いたします．
-
-※人数多数の場合，2週に分けて発表いたします．
-※人数多数の場合，2週に分けて発表いたします．
-＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊＊
-
-それでは，失礼いたします．
-""".format(naxtday)
-
-    if yesorno:
-        body = body1 + body2_2 + body3
-    else:
-        body = body1 + body2_1 + body3
-
-    return [subject,body]
-
 def get_pas():
     global password
     password = getpass.getpass()
@@ -159,9 +103,9 @@ def main(fig):
             today_data = datetime.datetime.now() + datetime.timedelta(days=setlist["Today"])
             nest_week = datetime.datetime.now() + datetime.timedelta(days=(7+setlist["Today"]))
 
-            listout = body_setting(today_data.strftime('%Y/%m/%d(%A)'),nest_week.strftime('%Y/%m/%d(%A)'),msg_list,sent_list is not None)
-            msg = MIMEText(listout[1])
-            msg["Subject"] = listout[0]
+            tmp_msg = emailtxt.mail_setting(today_data.strftime('%Y/%m/%d(%A)'),nest_week.strftime('%Y/%m/%d(%A)'),msg_list,sent_list is not None)
+            msg = MIMEText(tmp_msg)
+            msg["Subject"] = subject = "{0}の進捗報告会について".format(today_data.strftime('%Y/%m/%d(%A)'))
             msg["From"] = setlist["From_email"]
             msg["To"] = setlist["To_email"]
             sent_mail(setlist["From_email"],password,msg)
