@@ -24,13 +24,13 @@ def spreadsheet_func():#2つのAPIを記述しないとリフレッシュトー�
 
     #認証情報設定
     #ダウンロードしたjsonファイル名をクレデンシャル変数に設定（秘密鍵、Pythonファイルから読み込みしやすい位置に置く）
-    credentials = ServiceAccountCredentials.from_json_keyfile_name('spreadsheet-3-dcb1fdb37648.json', scope)
+    credentials = ServiceAccountCredentials.from_json_keyfile_name('example.json', scope)
 
     #OAuth2の資格情報を使用してGoogle APIにログインします。
     gc = gspread.authorize(credentials)
 
     #共有設定したスプレッドシートキーを変数[SPREADSHEET_KEY]に格納する。
-    SPREADSHEET_KEY = '1TSiFA-ZrAvkGtg363fHp6tY9iRae0QllGst5TTkdPX8'
+    SPREADSHEET_KEY = 'key'
 
     #共有設定したスプレッドシートのシート1を開く
     worksheet = gc.open_by_key(SPREADSHEET_KEY).sheet1
@@ -64,20 +64,20 @@ def sent_mail(gmail_account,gmail_password,msg):
 def body_setting(today,naxtday,namelist,yesorno):
     body1 = """
 ※自動送信です．
-佐藤研究室の皆様
+tttの皆様
 
 平素よりお世話になっております．
-佐藤研究室の田中です．
+tttのnameです．
 """
     subject = today + "の進捗報告会について"
     body2_1 = """
-https://docs.google.com/spreadsheets/d/1TSiFA-ZrAvkGtg363fHp6tY9iRae0QllGst5TTkdPX8/edit?usp=sharing
+
 上記のスプレッドシートの通り，今週進捗発表希望者がいなかったため，
 今週{0}の進捗報告会は，お休みとさせていただきます．
 """.format(today)
 
     body2_2 = """
-https://docs.google.com/spreadsheets/d/1TSiFA-ZrAvkGtg363fHp6tY9iRae0QllGst5TTkdPX8/edit?usp=sharing
+
 上記のスプレッドシートの通り，
 {1}
 が報告を希望されたので，今週{0}の進捗報告会は開催となります．
@@ -89,7 +89,7 @@ https://docs.google.com/spreadsheets/d/1TSiFA-ZrAvkGtg363fHp6tY9iRae0QllGst5TTkd
 以下の通りに，希望届を提出してください．
 
 ※いつかのメールの内容
-https://forms.gle/AEWTkZ4VeHUAw9G58
+
 ↑のフォームに回答していただき，田中から全体に開催のご連絡をする形にいたします．
 フォームは，使いまわしますので卒業まで上記のURLから申請してください．
 また，以下にフォーム利用の注意点について，記載いたします．

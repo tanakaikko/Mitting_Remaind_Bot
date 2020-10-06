@@ -7,4 +7,4 @@ remainder.get_pas()
 while True:
     print("search!",fig)
     fig = remainder.main(fig)
-    time.sleep(60*1)
+    time.sleep(60*3)
