@@ -4,9 +4,10 @@ from oauth2client.service_account import ServiceAccountCredentials
 import smtplib, ssl, getpass,emailtxt
 from email.mime.text import MIMEText
 
-
+#global password val
 password = ""
 
+#weekly list get
 def weekly_list(N):
     out_list = []
     for i in range(N):
@@ -14,11 +15,13 @@ def weekly_list(N):
         out_list.append(date_N_days_ago)
     return out_list
 
+#json data get
 def get_json_list(json_name):
     with open(json_name) as f:
         para_list = json.load(f)
     return para_list
 
+#spreadsheet setting
 def spreadsheet_func():#2つのAPIを記述しないとリフレッシュトークンを3600秒毎に発行し続けなければならない
     scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
 
@@ -37,6 +40,7 @@ def spreadsheet_func():#2つのAPIを記述しないとリフレッシュトー�
 
     return worksheet
 
+#spreadsheet get cell
 def get_cell():
     worksheet = spreadsheet_func()
 
@@ -54,6 +58,7 @@ def get_cell():
 
     return import_value_list
 
+#sent mail
 def sent_mail(gmail_account,gmail_password,msg):
     # Gmailに接続 --- (*4)
     server = smtplib.SMTP_SSL("smtp.gmail.com", 465,
@@ -61,10 +66,12 @@ def sent_mail(gmail_account,gmail_password,msg):
     server.login(gmail_account, gmail_password)
     server.send_message(msg) # メールの送信
 
+#password get
 def get_pas():
     global password
     password = getpass.getpass()
 
+#main def
 def main(fig):
     #Sunday Monday Tuesday Wednesday Thursday Friday Saturday
     dt_now = datetime.datetime.now()
@@ -78,7 +85,7 @@ def main(fig):
     #minuts set
     minutes = dt_now.strftime('%M')
 
-    print(int(hour),int(minutes))
+    print(dt_now.strftime('%Y/%m/%d(%A) %H:%M'))
     num_days = 6
     weeklist = weekly_list(num_days)
 
