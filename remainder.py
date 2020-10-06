@@ -21,28 +21,19 @@ def get_json_list(json_name):
         para_list = json.load(f)
     return para_list
 
-#spreadsheet setting
-def spreadsheet_func():#2つのAPIを記述しないとリフレッシュトークンを3600秒毎に発行し続けなければならない
+#spreadsheet get cell
+def get_cell(keyjson,SPREADSHEET_KEY):
     scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
 
     #認証情報設定
     #ダウンロードしたjsonファイル名をクレデンシャル変数に設定（秘密鍵、Pythonファイルから読み込みしやすい位置に置く）
-    credentials = ServiceAccountCredentials.from_json_keyfile_name('example.json', scope)
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(keyjson, scope)
 
     #OAuth2の資格情報を使用してGoogle APIにログインします。
     gc = gspread.authorize(credentials)
 
-    #共有設定したスプレッドシートキーを変数[SPREADSHEET_KEY]に格納する。
-    SPREADSHEET_KEY = 'key'
-
     #共有設定したスプレッドシートのシート1を開く
     worksheet = gc.open_by_key(SPREADSHEET_KEY).sheet1
-
-    return worksheet
-
-#spreadsheet get cell
-def get_cell():
-    worksheet = spreadsheet_func()
 
     import_value = 'null'
     i = 1
@@ -93,7 +84,7 @@ def main(fig):
 
     if dw == setlist["Day of the week"]:
         if int(hour) >= setlist["Hour"] and int(minutes) >= setlist["Minutes"] and fig:
-            output_data = get_cell()
+            output_data = get_cell(setlist["keyjson"],setlist["SPREADSHEET_KEY"])
             sent_list = []
             #内容があるかサーチ
             i = 1
