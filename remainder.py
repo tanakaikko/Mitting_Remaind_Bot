@@ -103,12 +103,14 @@ def main(fig):
 
             tmp_msg = emailtxt.mail_setting(today_data.strftime('%Y/%m/%d(%A)'),nest_week.strftime('%Y/%m/%d(%A)'),msg_list,sent_list is not None)
             msg = MIMEText(tmp_msg)
-            msg["Subject"] = subject = "{0}の進捗報告会について".format(today_data.strftime('%Y/%m/%d(%A)'))
+            msg["Subject"]  = "{0}の進捗報告会について".format(today_data.strftime('%Y/%m/%d(%A)'))
             msg["From"] = setlist["From_email"]
             msg["To"] = setlist["To_email"]
             sent_mail(setlist["From_email"],password,msg)
+            print('sent email!')
             
-        return False
-
+            return False
+        else:
+            pass
     else:
         return True
