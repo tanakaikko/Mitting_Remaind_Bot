@@ -84,6 +84,7 @@ def main(fig):
 
     if dw == setlist["Day of the week"]:
         if int(hour) >= setlist["Hour"] and int(minutes) >= setlist["Minutes"] and fig:
+            print('sent email standby')
             output_data = get_cell(setlist["keyjson"],setlist["SPREADSHEET_KEY"])
             sent_list = []
             #内容があるかサーチ
@@ -100,15 +101,18 @@ def main(fig):
             
             today_data = datetime.datetime.now() + datetime.timedelta(days=setlist["Today"])
             nest_week = datetime.datetime.now() + datetime.timedelta(days=(7+setlist["Today"]))
-
-            tmp_msg = emailtxt.mail_setting(today_data.strftime('%Y/%m/%d(%A)'),nest_week.strftime('%Y/%m/%d(%A)'),msg_list,sent_list is not None)
+            tmp_msg = emailtxt.mail_setting(today_data.strftime('%Y/%m/%d(%A)'),nest_week.strftime('%Y/%m/%d(%A)'),msg_list,sent_list != [])
             msg = MIMEText(tmp_msg)
             msg["Subject"]  = "{0}の進捗報告会について".format(today_data.strftime('%Y/%m/%d(%A)'))
             msg["From"] = setlist["From_email"]
             msg["To"] = setlist["To_email"]
-            sent_mail(setlist["From_email"],password,msg)
-            print('sent email!')
             
+            try:    
+                sent_mail(setlist["From_email"],password,msg)
+                print('sent email!')
+            except:
+                print('miss sent email')
+
             return False
         else:
             pass
